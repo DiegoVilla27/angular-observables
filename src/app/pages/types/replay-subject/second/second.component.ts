@@ -1,26 +1,27 @@
 import { Component, OnDestroy } from "@angular/core";
-import { IUser } from "../../../../interfaces/user.interface";
-import { TypeSubjectService } from "../../../../services/subject.service";
+import { IPost } from "../../../../interfaces/post.interface";
 import { ReplaySubject, takeUntil } from "rxjs";
+import { ReplaySubjectService } from "../../../../services/replay-subject.service";
 
 @Component({
-  selector: "subject-second",
+  selector: "replay-subject-second",
   templateUrl: "./second.component.html",
   styleUrl: "./second.component.scss"
 })
 export class SecondComponent implements OnDestroy {
-  users: IUser[] = [];
+  posts: IPost[] = [];
   stop$: ReplaySubject<boolean> = new ReplaySubject<boolean>(0);
 
-  constructor(private _typeSubjectSvc: TypeSubjectService) {}
+  constructor(private _replaySubjectSvc: ReplaySubjectService) {}
 
   ngOnDestroy(): void {
     this.stop$.unsubscribe();
   }
 
-  watchUsers(): void {
-    this._typeSubjectSvc.usersObs$
+  watchPosts(): void {
+    this._replaySubjectSvc
+      .getPosts()
       .pipe(takeUntil(this.stop$))
-      .subscribe((users: IUser[]) => (this.users = users));
+      .subscribe((posts: IPost[]) => (this.posts = posts.slice(-2)));
   }
 }

@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from "@angular/core";
 import { IUser } from "../../../../interfaces/user.interface";
-import { TypeSubjectService } from "../../../../services/type-subject.service";
+import { TypeSubjectService } from "../../../../services/subject.service";
 import { ReplaySubject, takeUntil } from "rxjs";
 
 @Component({

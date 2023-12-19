@@ -1,0 +1,5 @@
+<h4>Subscribe and load initial values: <button (click)="addPost()">Add new post</button></h4>
+
+<ul>
+  <li *ngFor='let post of posts'>- {{post.title}} {{post.id}}</li>
+</ul>
