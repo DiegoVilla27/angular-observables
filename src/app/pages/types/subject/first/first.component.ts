@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from "@angular/core";
+import { Subject, takeUntil } from "rxjs";
 import { IUser } from "../../../../interfaces/user.interface";
 import { TypeSubjectService } from "../../../../services/subject.service";
-import { ReplaySubject, takeUntil } from "rxjs";
 
 @Component({
   selector: "subject-first",
@@ -10,19 +10,20 @@ import { ReplaySubject, takeUntil } from "rxjs";
 })
 export class FirstComponent implements OnInit, OnDestroy {
   users: IUser[] = [];
-  stop$: ReplaySubject<boolean> = new ReplaySubject<boolean>(0);
+  stopObs$: Subject<void> = new Subject<void>();
 
   constructor(private _typeSubjectSvc: TypeSubjectService) {}
 
   ngOnInit(): void {
     this._typeSubjectSvc.usersObs$
-      .pipe(takeUntil(this.stop$))
+      .pipe(takeUntil(this.stopObs$))
       .subscribe((users: IUser[]) => (this.users = users));
     this._typeSubjectSvc.loadUsers();
   }
 
   ngOnDestroy(): void {
-    this.stop$.unsubscribe();
+    this.stopObs$.next();
+    this.stopObs$.complete();
   }
 
   addUser(): void {

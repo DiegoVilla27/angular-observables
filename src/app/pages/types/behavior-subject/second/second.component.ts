@@ -1,6 +1,6 @@
 import { Component } from "@angular/core";
+import { Subject, takeUntil } from "rxjs";
 import { IComment } from "../../../../interfaces/comment.interface";
-import { ReplaySubject, takeUntil } from "rxjs";
 import { BehaviorSubjectService } from "../../../../services/behavior-subject.service";
 
 @Component({
@@ -10,18 +10,19 @@ import { BehaviorSubjectService } from "../../../../services/behavior-subject.se
 })
 export class SecondComponent {
   comments: IComment[] = [];
-  stop$: ReplaySubject<boolean> = new ReplaySubject<boolean>();
+  stopObs$: Subject<void> = new Subject<void>();
 
   constructor(private _behaviorSubjectSvc: BehaviorSubjectService) {}
 
   ngOnDestroy(): void {
-    this.stop$.unsubscribe();
+    this.stopObs$.next();
+    this.stopObs$.complete();
   }
 
   watchComments(): void {
     this._behaviorSubjectSvc
       .getComments()
-      .pipe(takeUntil(this.stop$))
+      .pipe(takeUntil(this.stopObs$))
       .subscribe((comments: IComment[]) => (this.comments = comments));
   }
 }

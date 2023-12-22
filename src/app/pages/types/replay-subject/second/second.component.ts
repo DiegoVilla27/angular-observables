@@ -1,6 +1,6 @@
 import { Component, OnDestroy } from "@angular/core";
+import { Subject, takeUntil } from "rxjs";
 import { IPost } from "../../../../interfaces/post.interface";
-import { ReplaySubject, takeUntil } from "rxjs";
 import { ReplaySubjectService } from "../../../../services/replay-subject.service";
 
 @Component({
@@ -10,18 +10,19 @@ import { ReplaySubjectService } from "../../../../services/replay-subject.servic
 })
 export class SecondComponent implements OnDestroy {
   posts: IPost[] = [];
-  stop$: ReplaySubject<boolean> = new ReplaySubject<boolean>(0);
+  stopObs$: Subject<void> = new Subject<void>();
 
   constructor(private _replaySubjectSvc: ReplaySubjectService) {}
 
   ngOnDestroy(): void {
-    this.stop$.unsubscribe();
+    this.stopObs$.next();
+    this.stopObs$.complete();
   }
 
   watchPosts(): void {
     this._replaySubjectSvc
       .getPosts()
-      .pipe(takeUntil(this.stop$))
+      .pipe(takeUntil(this.stopObs$))
       .subscribe((posts: IPost[]) => (this.posts = posts.slice(-2)));
   }
 }
