@@ -1,5 +1,5 @@
 import { Component } from "@angular/core";
-import { switchMap, tap } from "rxjs";
+import { Subject, switchMap, takeUntil, tap } from "rxjs";
 import { IComment } from "../../../interfaces/comment.interface";
 import { IPost } from "../../../interfaces/post.interface";
 import { SwitchMapService } from "../../../services/switch-map.service";
@@ -12,6 +12,7 @@ import { SwitchMapService } from "../../../services/switch-map.service";
 export class SwitchMapComponent {
   post: IPost = { id: 0, body: "", title: "" };
   comments: IComment[] = [];
+  stopObs$: Subject<void> = new Subject<void>();
 
   constructor(private _switchMapSvc: SwitchMapService) {}
 
@@ -19,11 +20,17 @@ export class SwitchMapComponent {
     this._switchMapSvc
       .getPosts()
       .pipe(
+        takeUntil(this.stopObs$),
         tap((post: IPost) => (this.post = post)),
         switchMap((res: IPost) => {
           return this._switchMapSvc.getComments(res.id.toString());
         })
       )
       .subscribe((comments: IComment[]) => (this.comments = comments));
+  }
+
+  ngOnDestroy(): void {
+    this.stopObs$.next();
+    this.stopObs$.complete();
   }
 }
