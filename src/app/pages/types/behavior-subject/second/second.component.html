@@ -1,0 +1,5 @@
+<button (click)="watchComments()">Observer behavior subject</button>
+
+<ul>
+  <li *ngFor='let comment of comments'>- {{comment.name}} {{comment.id}}</li>
+</ul>

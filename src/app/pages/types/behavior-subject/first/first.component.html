@@ -1,0 +1,5 @@
+<h4>Subscribe and load initial values: <button (click)="addComment()">Add new comment</button></h4>
+
+<ul>
+  <li *ngFor='let comment of comments'>- {{comment.name}} {{comment.id}}</li>
+</ul>
